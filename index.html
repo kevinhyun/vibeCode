@@ -1,0 +1,1001 @@
+!DOCTYPE html
+html lang=ko
+head
+meta charset=UTF-8 
+meta name=viewport content=width=device-width, initial-scale=1.0 
+title바이브 코딩 — 느낌으로 코딩하라title
+link href=httpsfonts.googleapis.comcss2family=Synewght@700;800&family=JetBrains+Monowght@400;700&display=swap rel=stylesheet 
+
+style
+ ─── RESET & BASE ─────────────────────────────── 
+, before, after { margin0; padding0; box-sizingborder-box; }
+html { scroll-behaviorsmooth; font-size16px; }
+
+root {
+  --bg       #07080f;
+  --surface  #0d0f1c;
+  --card     #111326;
+  --border   rgba(255,255,255,0.07);
+  --green    #00ffa3;
+  --pink     #ff2d78;
+  --blue     #3d9dff;
+  --yellow   #ffd234;
+  --text     #dde1f0;
+  --muted    rgba(221,225,240,0.45);
+  --font-display 'Syne', sans-serif;
+  --font-body    'Malgun Gothic', '맑은 고딕', sans-serif;
+  --font-mono    'JetBrains Mono', monospace;
+}
+
+body {
+  background var(--bg);
+  color var(--text);
+  font-family var(--font-body);
+  overflow-x hidden;
+  line-height 1;
+}
+
+a { text-decorationnone; colorinherit; }
+
+ ─── CUSTOM CURSOR ─────────────────────────────── 
+.cursor-dot, .cursor-ring {
+  position fixed;
+  pointer-events none;
+  z-index 9999;
+  border-radius 50%;
+  transform translate(-50%, -50%);
+}
+.cursor-dot {
+  width 8px; height 8px;
+  background var(--green);
+  top 0; left 0;
+  transition opacity .3s;
+}
+.cursor-ring {
+  width 32px; height 32px;
+  border 1.5px solid var(--green);
+  top 0; left 0;
+  transition width .25s, height .25s, border-color .25s, opacity .3s;
+  mix-blend-mode screen;
+}
+.cursor-ring.hovered { width 48px; height 48px; border-color var(--pink); }
+@media (pointercoarse) { .cursor-dot, .cursor-ring { displaynone; } body { cursorauto; } }
+@media (pointerfine) { body { cursornone; } }
+
+ ─── NOISE OVERLAY ─────────────────────────────── 
+bodyafter {
+  content'';
+  positionfixed; inset0;
+  background-imageurl(dataimagesvg+xml,%3Csvg xmlns='httpwww.w3.org2000svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'%3E%3Cfilter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.035'%3E%3Csvg%3E);
+  pointer-eventsnone;
+  z-index9000;
+}
+
+ ─── PROGRESS BAR ────────────────────────────────── 
+.progress-bar {
+  positionfixed; top0; left0;
+  height2px; backgroundvar(--green);
+  z-index600; width0%;
+  box-shadow0 0 12px var(--green);
+  transitionwidth .1s linear;
+}
+
+ ─── NAV ─────────────────────────────────────────── 
+nav {
+  positionfixed; top0; left0; right0;
+  z-index500;
+  padding1.4rem 4rem;
+  displayflex; align-itemscenter; justify-contentspace-between;
+  backdrop-filterblur(24px) saturate(1.6);
+  backgroundrgba(7,8,15,0.65);
+  border-bottom1px solid var(--border);
+  transitionpadding .3s;
+}
+nav.scrolled { padding.9rem 4rem; }
+
+.nav-logo {
+  font-family var(--font-display);
+  font-size1.5rem;
+  font-weight800;
+  letter-spacing.04em;
+  color var(--green);
+  text-shadow0 0 18px rgba(0,255,163,0.55);
+}
+.nav-logo span { color var(--pink); }
+
+.nav-links {
+  displayflex; gap2.5rem; list-stylenone;
+}
+.nav-links a {
+  font-family var(--font-mono);
+  font-size.68rem;
+  letter-spacing.18em;
+  text-transformuppercase;
+  color var(--muted);
+  transitioncolor .2s;
+}
+.nav-links ahover { colorvar(--green); }
+
+.nav-cta {
+  font-family var(--font-mono);
+  font-size.72rem;
+  letter-spacing.12em;
+  text-transformuppercase;
+  padding.65rem 1.6rem;
+  background var(--green);
+  color#000;
+  font-weight700;
+  transitionbox-shadow .25s, transform .2s;
+  displayinline-block;
+}
+.nav-ctahover { box-shadow0 0 24px rgba(0,255,163,0.5); transformtranslateY(-1px); }
+
+.nav-toggle { displaynone; flex-directioncolumn; gap5px; cursorpointer; backgroundnone; bordernone; }
+.nav-toggle span { displayblock; width24px; height2px; backgroundvar(--text); transitionall .3s; }
+
+ ─── HERO ─────────────────────────────────────────── 
+.hero {
+  min-height100vh;
+  displayflex; align-itemscenter; justify-contentcenter;
+  positionrelative;
+  overflowhidden;
+  padding9rem 4rem 5rem;
+}
+
+.hero-grid {
+  positionabsolute; inset0;
+  background-image
+    linear-gradient(rgba(0,255,163,.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,255,163,.055) 1px, transparent 1px);
+  background-size72px 72px;
+  mask-imageradial-gradient(ellipse 80% 80% at 50% 50%, #000 30%, transparent 100%);
+  animationgridPulse 6s ease-in-out infinite;
+}
+@keyframes gridPulse { 0%,100%{opacity.6} 50%{opacity1} }
+
+.hero-glow {
+  positionabsolute; border-radius50%;
+  filterblur(110px); pointer-eventsnone;
+  transitiontransform .6s ease;
+}
+.glow-g { width580px; height580px; backgroundrgba(0,255,163,.1);  top-140px; left-100px; }
+.glow-p { width500px; height500px; backgroundrgba(255,45,120,.09); bottom-80px; right-80px; }
+.glow-b { width380px; height380px; backgroundrgba(61,157,255,.07); top35%; right8%; }
+
+.hero-inner {
+  positionrelative; z-index2;
+  max-width1160px; width100%;
+  displaygrid; grid-template-columns1fr auto;
+  gap4rem; align-itemscenter;
+}
+
+.hero-eyebrow {
+  font-family var(--font-mono);
+  font-size.7rem; letter-spacing.3em; text-transformuppercase;
+  colorvar(--green); margin-bottom1.6rem;
+  displayflex; align-itemscenter; gap.8rem;
+  opacity0; animationfadeUp .6s ease .3s forwards;
+}
+.eyebrow-dot {
+  width6px; height6px; border-radius50%;
+  backgroundvar(--green);
+  box-shadow0 0 8px var(--green);
+  animationblink 1.4s step-end infinite;
+}
+@keyframes blink { 0%,100%{opacity1} 50%{opacity0} }
+
+.hero-title {
+  font-family var(--font-display);
+  font-sizeclamp(3.8rem,10vw,9.5rem);
+  line-height1;
+  font-weight800;
+  margin-bottom1.8rem;
+  opacity0; animationfadeUp .7s ease .5s forwards;
+}
+.hero-title .t1 { displayblock; color#fff; }
+.hero-title .t2 {
+  displayblock;
+  -webkit-text-stroke2px var(--pink);
+  colortransparent;
+  text-shadow0 0 50px rgba(255,45,120,.28);
+}
+
+.hero-desc {
+  font-size1.05rem; line-height1.85; font-weight300;
+  colorvar(--muted); max-width520px;
+  margin-bottom2.8rem;
+  opacity0; animationfadeUp .7s ease .7s forwards;
+}
+
+.hero-actions {
+  displayflex; gap1.2rem; align-itemscenter; flex-wrapwrap;
+  opacity0; animationfadeUp .7s ease .9s forwards;
+}
+
+.btn-primary {
+  displayinline-flex; align-itemscenter; gap.6rem;
+  padding1rem 2.2rem;
+  backgroundvar(--green); color#000;
+  font-familyvar(--font-mono); font-size.78rem;
+  font-weight700; letter-spacing.1em; text-transformuppercase;
+  positionrelative; overflowhidden;
+  transitiontransform .2s, box-shadow .25s;
+  bordernone; cursorpointer;
+}
+.btn-primaryafter {
+  content'';
+  positionabsolute; inset0;
+  backgroundlinear-gradient(105deg,transparent 40%,rgba(255,255,255,.35) 50%,transparent 60%);
+  transformtranslateX(-120%);
+  transitiontransform .45s;
+}
+.btn-primaryhover { transformtranslateY(-2px); box-shadow0 8px 30px rgba(0,255,163,.45); }
+.btn-primaryhoverafter { transformtranslateX(120%); }
+
+.btn-outline {
+  displayinline-flex; align-itemscenter; gap.6rem;
+  padding1rem 2.2rem;
+  border1px solid var(--border);
+  colorvar(--text);
+  font-familyvar(--font-mono); font-size.78rem;
+  letter-spacing.1em; text-transformuppercase;
+  transitionborder-color .25s, color .25s;
+  cursorpointer; backgroundnone;
+}
+.btn-outlinehover { border-colorvar(--blue); colorvar(--blue); }
+
+ Hero code widget 
+.hero-code-wrap {
+  opacity0; animationfadeLeft .9s ease 1.1s forwards;
+  flex-shrink0;
+}
+.hero-code {
+  backgroundrgba(13,15,28,.85);
+  border1px solid rgba(255,255,255,.09);
+  border-radius14px;
+  width380px;
+  overflowhidden;
+  backdrop-filterblur(12px);
+  box-shadow0 30px 80px rgba(0,0,0,.5), 0 0 0 1px rgba(0,255,163,.07);
+}
+.code-bar {
+  displayflex; align-itemscenter; gap.5rem;
+  padding.9rem 1.2rem;
+  border-bottom1px solid rgba(255,255,255,.06);
+  backgroundrgba(255,255,255,.03);
+}
+.code-dot { width10px; height10px; border-radius50%; }
+.cd1{background#ff5f57;} .cd2{background#febc2e;} .cd3{background#28c840;}
+.code-filename {
+  font-familyvar(--font-mono); font-size.65rem;
+  colorvar(--muted); margin-leftauto;
+}
+.code-body {
+  padding1.4rem 1.6rem;
+  font-familyvar(--font-mono);
+  font-size.74rem; line-height2.1;
+}
+.code-body .cm { color#455070; }
+.code-body .kw { colorvar(--pink); }
+.code-body .fn { colorvar(--blue); }
+.code-body .st { colorvar(--yellow); }
+.code-body .va { colorvar(--green); }
+.code-body .pu { colorvar(--muted); }
+
+.type-cursor {
+  displayinline-block; width2px; height1em;
+  backgroundvar(--green); vertical-aligntext-bottom;
+  animationblink .8s step-end infinite; margin-left1px;
+}
+
+ ─── MARQUEE ─────────────────────────────────────── 
+.marquee-wrap {
+  overflowhidden; padding1.4rem 0;
+  border-top1px solid var(--border);
+  border-bottom1px solid var(--border);
+  backgroundrgba(255,255,255,.02);
+}
+.marquee-track {
+  displayflex; gap3rem; widthmax-content;
+  animationmarquee 22s linear infinite;
+}
+.marquee-trackhover { animation-play-statepaused; }
+.marquee-item {
+  displayflex; align-itemscenter; gap1.2rem;
+  font-familyvar(--font-display);
+  font-size.9rem; font-weight700; letter-spacing.08em;
+  colorvar(--muted); white-spacenowrap;
+}
+.marquee-sep { width5px; height5px; border-radius50%; backgroundvar(--green); flex-shrink0; }
+
+@keyframes marquee { from{transformtranslateX(0)} to{transformtranslateX(-50%)} }
+
+ ─── SECTION BASE ─────────────────────────────────── 
+.section { padding8rem 4rem; }
+.section-inner { max-width1160px; margin0 auto; }
+
+.section-tag {
+  font-familyvar(--font-mono);
+  font-size.66rem; letter-spacing.28em; text-transformuppercase;
+  colorvar(--green); margin-bottom1rem;
+  displayinline-flex; align-itemscenter; gap.6rem;
+}
+.section-tagbefore { content''; colorvar(--muted); }
+
+.section-title {
+  font-familyvar(--font-display);
+  font-sizeclamp(2.2rem,4.5vw,4rem);
+  line-height1.05; color#fff;
+  font-weight800;
+  margin-bottom1.2rem;
+}
+.section-sub {
+  font-size1rem; line-height1.85;
+  colorvar(--muted); max-width560px;
+}
+
+ ─── WHAT IS ─────────────────────────────────────── 
+.what-grid {
+  displaygrid; grid-template-columns1fr 1fr;
+  gap5rem; align-itemscenter; margin-top5rem;
+}
+.what-text p {
+  font-size1rem; line-height1.9;
+  colorvar(--muted); margin-bottom1.4rem;
+}
+.what-text p strong { colorvar(--text); font-weight500; }
+.what-text em { colorvar(--green); font-stylenormal; font-familyvar(--font-mono); font-size.9em; }
+
+.what-visual { positionrelative; height440px; }
+.chat-card {
+  positionabsolute; padding1.1rem 1.4rem;
+  border-radius12px; font-size.82rem; line-height1.65;
+  max-width280px;
+  animationfloatY 4.5s ease-in-out infinite;
+  border1px solid var(--border); backdrop-filterblur(8px);
+}
+.chat-card .chat-tag {
+  font-familyvar(--font-mono); font-size.6rem;
+  letter-spacing.15em; text-transformuppercase;
+  margin-bottom.5rem; opacity.7;
+}
+.cc1 { backgroundrgba(0,255,163,.07); border-colorrgba(0,255,163,.2); colorrgba(0,255,163,.9); top20px; left0; animation-delay0s; }
+.cc2 { backgroundrgba(61,157,255,.07); border-colorrgba(61,157,255,.2); colorrgba(140,195,255,.9); top150px; right0; animation-delay.9s; }
+.cc3 { backgroundrgba(255,210,52,.06); border-colorrgba(255,210,52,.18); colorrgba(255,218,100,.9); bottom120px; left30px; animation-delay1.5s; }
+.cc4 { backgroundrgba(255,45,120,.06); border-colorrgba(255,45,120,.18); colorrgba(255,130,165,.9); bottom0; right15px; animation-delay.5s; }
+
+@keyframes floatY { 0%,100%{transformtranslateY(0px)} 50%{transformtranslateY(-10px)} }
+
+ ─── HOW IT WORKS ─────────────────────────────────── 
+.how-section { backgroundvar(--surface); }
+.steps {
+  displaygrid; grid-template-columnsrepeat(3,1fr);
+  gap2px; margin-top4rem;
+  backgroundvar(--border);
+  border1px solid var(--border);
+}
+.step {
+  backgroundvar(--card);
+  padding3rem 2.5rem;
+  positionrelative; overflowhidden;
+  transitionbackground .3s;
+}
+.stephover { background#151830; }
+.step-num {
+  positionabsolute; top-8px; right1.5rem;
+  font-familyvar(--font-display);
+  font-size8rem; colorrgba(255,255,255,.03);
+  line-height1; pointer-eventsnone; user-selectnone;
+}
+.step-icon { font-size2.2rem; margin-bottom1.6rem; displayblock; }
+.stepnth-child(1) .step-icon { filterdrop-shadow(0 0 8px var(--green)); }
+.stepnth-child(2) .step-icon { filterdrop-shadow(0 0 8px var(--blue)); }
+.stepnth-child(3) .step-icon { filterdrop-shadow(0 0 8px var(--pink)); }
+.step-title { font-familyvar(--font-display); font-size1.4rem; font-weight800; letter-spacing-.01em; color#fff; margin-bottom.8rem; }
+.step p { font-size.9rem; line-height1.8; colorvar(--muted); }
+
+ ─── FEATURES ─────────────────────────────────────── 
+.feat-grid {
+  displaygrid; grid-template-columnsrepeat(2,1fr);
+  gap1.5rem; margin-top4rem;
+}
+.feat-card {
+  padding2.5rem;
+  border1px solid var(--border);
+  backgroundvar(--surface);
+  positionrelative; overflowhidden;
+  transitionborder-color .3s, transform .3s;
+}
+.feat-cardbefore {
+  content''; positionabsolute;
+  top0; left0; right0; height2px;
+  transitionopacity .3s; opacity0;
+}
+.feat-cardnth-child(1)before { backgroundvar(--green); }
+.feat-cardnth-child(2)before { backgroundvar(--blue); }
+.feat-cardnth-child(3)before { backgroundvar(--pink); }
+.feat-cardnth-child(4)before { backgroundvar(--yellow); }
+.feat-cardhoverbefore { opacity1; }
+.feat-cardhover { border-colorrgba(255,255,255,.14); transformtranslateY(-3px); }
+.feat-icon { font-size1.8rem; margin-bottom1.2rem; displayblock; }
+.feat-title { font-familyvar(--font-display); font-size1.25rem; font-weight800; letter-spacing-.01em; color#fff; margin-bottom.8rem; }
+.feat-desc { font-size.9rem; line-height1.8; colorvar(--muted); }
+
+ ─── COMPARE ─────────────────────────────────────── 
+.compare-section { backgroundvar(--surface); }
+.compare-grid {
+  displaygrid; grid-template-columns1fr 1fr;
+  gap2rem; margin-top4rem;
+}
+.compare-card { padding2.5rem; }
+.compare-old { backgroundrgba(255,45,120,.05); border1px solid rgba(255,45,120,.15); }
+.compare-new { backgroundrgba(0,255,163,.05); border1px solid rgba(0,255,163,.15); }
+.compare-label {
+  font-familyvar(--font-mono); font-size.66rem;
+  letter-spacing.2em; text-transformuppercase;
+  margin-bottom1.5rem; displayflex; align-itemscenter; gap.5rem;
+}
+.compare-old .compare-label { colorvar(--pink); }
+.compare-new .compare-label { colorvar(--green); }
+.compare-list { list-stylenone; displayflex; flex-directioncolumn; gap.9rem; }
+.compare-list li { displayflex; align-itemsflex-start; gap.9rem; font-size.9rem; line-height1.6; colorvar(--muted); }
+.compare-list libefore { flex-shrink0; font-size1rem; margin-top-.05rem; }
+.compare-old .compare-list libefore { content'✗'; colorvar(--pink); }
+.compare-new .compare-list libefore { content'✓'; colorvar(--green); }
+
+ ─── TESTIMONIALS ─────────────────────────────────── 
+.testimonials-section { backgroundvar(--surface); }
+.testi-grid {
+  displaygrid; grid-template-columnsrepeat(3,1fr);
+  gap1.5rem; margin-top4rem;
+}
+.testi-card {
+  padding2rem; border1px solid var(--border);
+  backgroundvar(--card);
+  transitiontransform .3s;
+}
+.testi-cardhover { transformtranslateY(-4px); }
+.testi-quote { font-size2.5rem; line-height1; font-familyvar(--font-display); font-weight800; colorvar(--green); margin-bottom1rem; opacity.5; }
+.testi-text { font-size.9rem; line-height1.8; colorvar(--muted); margin-bottom1.5rem; }
+.testi-author { displayflex; align-itemscenter; gap.8rem; padding-top1.2rem; border-top1px solid var(--border); }
+.testi-avatar { width36px; height36px; border-radius50%; displayflex; align-itemscenter; justify-contentcenter; font-size1.1rem; flex-shrink0; }
+.av1{backgroundrgba(0,255,163,.12);} .av2{backgroundrgba(61,157,255,.12);} .av3{backgroundrgba(255,45,120,.12);}
+.testi-name { font-size.82rem; colorvar(--text); font-weight500; }
+.testi-role { font-size.72rem; colorvar(--muted); font-familyvar(--font-mono); }
+
+ ─── CTA ─────────────────────────────────────────── 
+.cta-section {
+  padding9rem 4rem;
+  positionrelative; overflowhidden;
+}
+.cta-bg {
+  positionabsolute; inset0;
+  backgroundradial-gradient(ellipse 60% 80% at 50% 50%, rgba(0,255,163,.08) 0%, transparent 70%);
+}
+.cta-grid-lines {
+  positionabsolute; inset0;
+  background-image
+    linear-gradient(rgba(0,255,163,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,255,163,.04) 1px, transparent 1px);
+  background-size64px 64px;
+  mask-imageradial-gradient(ellipse 70% 90% at 50% 50%, #000 20%, transparent 100%);
+}
+.cta-inner { positionrelative; z-index2; max-width780px; margin0 auto; text-aligncenter; }
+.cta-title { font-familyvar(--font-display); font-sizeclamp(2.5rem,6vw,5.5rem); font-weight800; line-height1.05; color#fff; margin-bottom1.5rem; }
+.cta-title span { -webkit-text-stroke2px var(--green); colortransparent; }
+.cta-sub { font-size1.05rem; line-height1.85; colorvar(--muted); margin-bottom3rem; }
+.cta-actions { displayflex; gap1.2rem; justify-contentcenter; flex-wrapwrap; }
+
+ ─── FOOTER ─────────────────────────────────────────── 
+footer {
+  padding3rem 4rem;
+  border-top1px solid var(--border);
+  displayflex; align-itemscenter; justify-contentspace-between;
+  gap2rem; flex-wrapwrap;
+}
+.footer-logo { font-familyvar(--font-display); font-size1.3rem; font-weight800; letter-spacing.04em; colorvar(--green); }
+.footer-logo span { colorvar(--pink); }
+.footer-copy { font-familyvar(--font-mono); font-size.65rem; colorvar(--muted); letter-spacing.1em; }
+.footer-links { displayflex; gap2rem; list-stylenone; }
+.footer-links a { font-familyvar(--font-mono); font-size.65rem; colorvar(--muted); letter-spacing.1em; transitioncolor .2s; }
+.footer-links ahover { colorvar(--green); }
+
+ ─── SCROLL REVEAL ─────────────────────────────────── 
+.reveal {
+  opacity0; transformtranslateY(32px);
+  transitionopacity .75s ease, transform .75s ease;
+}
+.reveal.visible { opacity1; transformtranslateY(0); }
+.reveal-delay-1 { transition-delay.1s; }
+.reveal-delay-2 { transition-delay.2s; }
+.reveal-delay-3 { transition-delay.3s; }
+.reveal-delay-4 { transition-delay.4s; }
+
+ ─── KEYFRAMES ─────────────────────────────────────── 
+@keyframes fadeUp  { from{opacity0;transformtranslateY(24px)} to{opacity1;transformtranslateY(0)} }
+@keyframes fadeLeft{ from{opacity0;transformtranslateX(30px)} to{opacity1;transformtranslateX(0)} }
+
+ ─── MOBILE NAV ─────────────────────────────────────── 
+.mobile-nav {
+  positionfixed; inset0;
+  backgroundrgba(7,8,15,.97);
+  z-index400;
+  displayflex; flex-directioncolumn; align-itemscenter; justify-contentcenter;
+  gap2.5rem;
+  transformtranslateX(100%);
+  transitiontransform .4s ease;
+}
+.mobile-nav.open { transformtranslateX(0); }
+.mobile-nav a { font-familyvar(--font-display); font-size2.5rem; font-weight800; letter-spacing-.01em; colorvar(--text); transitioncolor .2s; }
+.mobile-nav ahover { colorvar(--green); }
+
+ ─── RESPONSIVE ─────────────────────────────────────── 
+@media (max-width1024px) {
+  nav { padding1.2rem 2rem; }
+  nav.scrolled { padding.8rem 2rem; }
+  .hero { padding8rem 2rem 4rem; }
+  .hero-inner { grid-template-columns1fr; gap3rem; }
+  .hero-code-wrap { displayflex; justify-contentcenter; }
+  .hero-code { width100%; max-width480px; }
+  .what-grid { grid-template-columns1fr; gap3rem; }
+  .what-visual { height320px; }
+  .testi-grid { grid-template-columns1fr 1fr; }
+  .section { padding5rem 2rem; }
+  .cta-section { padding6rem 2rem; }
+}
+
+@media (max-width768px) {
+  nav { padding1rem 1.5rem; }
+  nav.scrolled { padding.75rem 1.5rem; }
+  .nav-links, .nav-cta { displaynone; }
+  .nav-toggle { displayflex; }
+  .steps { grid-template-columns1fr; }
+  .feat-grid { grid-template-columns1fr; }
+  .compare-grid { grid-template-columns1fr; }
+  .testi-grid { grid-template-columns1fr; }
+  .hero-title { font-sizeclamp(3.5rem,14vw,6rem); }
+  footer { flex-directioncolumn; text-aligncenter; padding2rem; }
+  .cta-section { padding5rem 1.5rem; }
+  .hero { padding7rem 1.5rem 4rem; }
+  .what-visual { height280px; }
+  .chat-card { max-width220px; font-size.76rem; }
+}
+style
+head
+
+body
+
+!-- Progress bar --
+div class=progress-bar id=progressBardiv
+
+!-- Custom cursor --
+div class=cursor-dot  id=cursorDotdiv
+div class=cursor-ring id=cursorRingdiv
+
+!-- Mobile nav overlay --
+div class=mobile-nav id=mobileNav
+  a href=#about    onclick=closeMobileNav()소개a
+  a href=#how      onclick=closeMobileNav()작동 원리a
+  a href=#features onclick=closeMobileNav()특징a
+  a href=#compare  onclick=closeMobileNav()비교a
+  a href=#start    onclick=closeMobileNav()시작하기a
+div
+
+!-- ══ NAV ══════════════════════════════════ --
+nav id=mainNav
+  div class=nav-logoVIBEspan.spanCODEdiv
+  ul class=nav-links
+    lia href=#about소개ali
+    lia href=#how작동 원리ali
+    lia href=#features특징ali
+    lia href=#compare비교ali
+  ul
+  a href=#start class=nav-cta시작하기 →a
+  button class=nav-toggle id=navToggle onclick=toggleMobileNav() aria-label=메뉴 열기
+    spanspanspanspanspanspan
+  button
+nav
+
+!-- ══ HERO ══════════════════════════════════ --
+section class=hero id=home
+  div class=hero-griddiv
+  div class=hero-glow glow-gdiv
+  div class=hero-glow glow-pdiv
+  div class=hero-glow glow-bdiv
+
+  div class=hero-inner
+    div class=hero-text
+      div class=hero-eyebrow
+        span class=eyebrow-dotspan
+        New Way to Build · AI-Native Development
+      div
+      h1 class=hero-title
+        span class=t1바이브span
+        span class=t2코딩span
+      h1
+      p class=hero-desc
+        코드를 외우지 말고, strong의도strong를 전달하세요.br
+        AI와 협업해 아이디어를 즉시 현실로 — 느낌대로, 빠르게, 자유롭게.
+      p
+      div class=hero-actions
+        a href=#how class=btn-primary어떻게 작동하나요 →a
+        a href=#about class=btn-outline더 알아보기a
+      div
+    div
+
+    div class=hero-code-wrap
+      div class=hero-code
+        div class=code-bar
+          div class=code-dot cd1div
+          div class=code-dot cd2div
+          div class=code-dot cd3div
+          span class=code-filenamevibe.jsspan
+        div
+        div class=code-body
+          span class=cm 🎯 내가 원하는 걸 말하면spanbr
+          span class=cm AI가 알아서 만들어 준다spanbrbr
+          span class=kwconstspan span class=vaideaspan = span class=st멋진 대시보드 만들어줘span;brbr
+          span class=fnvibeCodingspan(span class=vaideaspan).span class=fnthenspan(span class=varesultspan = {br
+          &nbsp;&nbsp;span class=fnconsolespan.span class=fnlogspan(span class=varesultspan.span class=vaappspan);br
+          &nbsp;&nbsp;span class=cm → 완성된 앱 🚀spanbr
+          });brbr
+          span class=cm 수정도 간단spanbr
+          span class=st색상을 더 밝게 해줘span;&nbsp;span class=type-cursorspan
+        div
+      div
+    div
+  div
+section
+
+!-- ══ MARQUEE ══════════════════════════════════ --
+div class=marquee-wrap
+  div class=marquee-track
+    div class=marquee-item바이브 코딩span class=marquee-sepspandiv
+    div class=marquee-itemAI PAIR PROGRAMMINGspan class=marquee-sepspandiv
+    div class=marquee-item자연어 개발span class=marquee-sepspandiv
+    div class=marquee-itemNO-FRICTION WORKFLOWspan class=marquee-sepspandiv
+    div class=marquee-item빠른 프로토타입span class=marquee-sepspandiv
+    div class=marquee-itemINTENT-DRIVEN CODEspan class=marquee-sepspandiv
+    div class=marquee-item누구나 개발자span class=marquee-sepspandiv
+    !-- duplicate for seamless loop --
+    div class=marquee-item바이브 코딩span class=marquee-sepspandiv
+    div class=marquee-itemAI PAIR PROGRAMMINGspan class=marquee-sepspandiv
+    div class=marquee-item자연어 개발span class=marquee-sepspandiv
+    div class=marquee-itemNO-FRICTION WORKFLOWspan class=marquee-sepspandiv
+    div class=marquee-item빠른 프로토타입span class=marquee-sepspandiv
+    div class=marquee-itemINTENT-DRIVEN CODEspan class=marquee-sepspandiv
+    div class=marquee-item누구나 개발자span class=marquee-sepspandiv
+  div
+div
+
+!-- ══ WHAT IS ══════════════════════════════════ --
+section class=section id=about
+  div class=section-inner
+    div class=reveal
+      div class=section-tag바이브 코딩이란div
+      h2 class=section-title코드가 아니라br의도를 말하세요h2
+    div
+
+    div class=what-grid
+      div class=what-text reveal reveal-delay-1
+        p
+          strong바이브 코딩(Vibe Coding)strong은 OpenAI의 안드레이 카르파시(Andrej Karpathy)가 2025년 제안한 개념으로, AI를 적극 활용해 코드를 거의 직접 작성하지 않고 소프트웨어를 만드는 새로운 개발 방식입니다.
+        p
+        p
+          개발자는 em이런 기능이 필요해em라고 자연어로 말하고, AI가 코드를 생성·수정·디버깅합니다. 오류가 나도 그냥 AI에게 붙여넣어 해결을 맡깁니다.
+        p
+        p
+          문법과 API를 외우는 시간 대신, strong무엇을 만들지strong에 집중하세요. 아이디어의 속도로 개발이 진행됩니다.
+        p
+      div
+
+      div class=what-visual reveal reveal-delay-2
+        div class=chat-card cc1
+          div class=chat-tag👤 사용자div
+          로그인 폼 만들어줘. 이메일 + 비밀번호 필드, 구글 로그인 버튼도 넣어줘.
+        div
+        div class=chat-card cc2
+          div class=chat-tag🤖 AIdiv
+          완성! 폼 유효성 검사와 에러 메시지까지 포함했어요. 버튼 색상 바꿀까요
+        div
+        div class=chat-card cc3
+          div class=chat-tag👤 사용자div
+          버튼 크게 하고, 다크 모드도 지원해줘.
+        div
+        div class=chat-card cc4
+          div class=chat-tag🤖 AIdiv
+          수정 완료 🎉 CSS 변수로 라이트다크 자동 전환됩니다!
+        div
+      div
+    div
+  div
+section
+
+!-- ══ HOW IT WORKS ══════════════════════════════════ --
+section class=section how-section id=how
+  div class=section-inner
+    div class=reveal
+      div class=section-tag작동 원리div
+      h2 class=section-title3단계로br소프트웨어 완성h2
+      p class=section-sub복잡한 개발 과정을 대화처럼 간단하게. 누구나 아이디어를 현실로 만들 수 있습니다.p
+    div
+
+    div class=steps
+      div class=step reveal reveal-delay-1
+        div class=step-num01div
+        span class=step-icon💬span
+        div class=step-title말로 설명하기div
+        p원하는 기능이나 화면을 자연어로 설명합니다. 할 일 목록 앱 만들어줘처럼 구체적일수록 좋습니다.p
+      div
+      div class=step reveal reveal-delay-2
+        div class=step-num02div
+        span class=step-icon⚡span
+        div class=step-titleAI가 구현div
+        pAI가 즉시 코드를 생성하고 실행 가능한 결과물을 만들어냅니다. 오류도 자동으로 수정합니다.p
+      div
+      div class=step reveal reveal-delay-3
+        div class=step-num03div
+        span class=step-icon🔁span
+        div class=step-title피드백 & 반복div
+        p이 부분을 바꿔줘라고 말하며 빠르게 반복합니다. 완성될 때까지 대화로 개선해 나갑니다.p
+      div
+    div
+  div
+section
+
+!-- ══ FEATURES ══════════════════════════════════ --
+section class=section id=features
+  div class=section-inner
+    div class=reveal
+      div class=section-tag핵심 특징div
+      h2 class=section-title왜 바이브 코딩인가h2
+      p class=section-sub기존 개발의 진입장벽을 허물고, 창의적 가능성을 최대로 끌어올립니다.p
+    div
+
+    div class=feat-grid
+      div class=feat-card reveal reveal-delay-1
+        span class=feat-icon🚀span
+        div class=feat-title10배 빠른 프로토타입div
+        p class=feat-desc아이디어가 떠오른 즉시 작동하는 프로토타입을 만들 수 있습니다. 기획부터 데모까지 몇 시간이면 충분합니다.p
+      div
+      div class=feat-card reveal reveal-delay-2
+        span class=feat-icon🎯span
+        div class=feat-title의도 중심 개발div
+        p class=feat-desc문법보다 목적에 집중합니다. 이런 기능이 필요해라고 말하면 세부 구현은 AI에게 맡기세요.p
+      div
+      div class=feat-card reveal reveal-delay-3
+        span class=feat-icon🌱span
+        div class=feat-title진입 장벽 제거div
+        p class=feat-desc비개발자도 아이디어를 소프트웨어로 만들 수 있습니다. 코딩 경험이 없어도 충분히 시작할 수 있습니다.p
+      div
+      div class=feat-card reveal reveal-delay-4
+        span class=feat-icon🔄span
+        div class=feat-title끊임없는 반복 개선div
+        p class=feat-desc결과물을 보면서 즉각 피드백을 주고 수정합니다. 변경 사항이 즉시 반영되는 인터랙티브한 개발 경험.p
+      div
+    div
+  div
+section
+
+!-- ══ COMPARE ══════════════════════════════════ --
+section class=section compare-section id=compare
+  div class=section-inner
+    div class=reveal
+      div class=section-tag비교div
+      h2 class=section-title기존 개발 vsbr바이브 코딩h2
+    div
+
+    div class=compare-grid
+      div class=compare-card compare-old reveal reveal-delay-1
+        div class=compare-label✗ 기존 개발 방식div
+        ul class=compare-list
+          li언어 문법과 API를 모두 외워야 함li
+          li개발 환경 설정에 수 시간 소요li
+          li오류 하나로 몇 시간을 디버깅li
+          li아이디어→구현까지 긴 시간li
+          li비개발자는 접근하기 어려움li
+          li보일러플레이트 코드 반복 작성li
+        ul
+      div
+      div class=compare-card compare-new reveal reveal-delay-2
+        div class=compare-label✓ 바이브 코딩div
+        ul class=compare-list
+          li자연어로 의도만 전달하면 OKli
+          li즉시 시작, 환경 설정 최소화li
+          li오류를 AI에게 붙여넣어 해결li
+          li아이디어→데모까지 몇 분~몇 시간li
+          li코딩 지식 없어도 앱 제작 가능li
+          li반복 코드 AI가 자동 생성li
+        ul
+      div
+    div
+  div
+section
+
+!-- ══ TESTIMONIALS ══════════════════════════════════ --
+section class=section testimonials-section
+  div class=section-inner
+    div class=reveal
+      div class=section-tag사용자 후기div
+      h2 class=section-title이미 바꾸고 있는br개발 문화h2
+    div
+
+    div class=testi-grid
+      div class=testi-card reveal reveal-delay-1
+        div class=testi-quotediv
+        p class=testi-text기획자인데 이제 직접 프로토타입을 만들어요. 개발팀에 의존하지 않고 아이디어를 바로 보여줄 수 있어서 너무 좋습니다.p
+        div class=testi-author
+          div class=testi-avatar av1👩div
+          div
+            div class=testi-name김민지div
+            div class=testi-roleProduct Manager @ 스타트업div
+          div
+        div
+      div
+      div class=testi-card reveal reveal-delay-2
+        div class=testi-quotediv
+        p class=testi-text주말 해커톤에서 처음 써봤는데, 혼자서 풀스택 앱을 완성했어요. 전에는 상상도 못 했던 일입니다.p
+        div class=testi-author
+          div class=testi-avatar av2👨div
+          div
+            div class=testi-name이준혁div
+            div class=testi-roleJunior Developerdiv
+          div
+        div
+      div
+      div class=testi-card reveal reveal-delay-3
+        div class=testi-quotediv
+        p class=testi-text반복적인 코드 작성 시간이 절반으로 줄었어요. 이제 정말 중요한 로직에만 집중할 수 있습니다.p
+        div class=testi-author
+          div class=testi-avatar av3🧑div
+          div
+            div class=testi-name박수연div
+            div class=testi-roleSenior Engineer @ 테크 기업div
+          div
+        div
+      div
+    div
+  div
+section
+
+!-- ══ CTA ══════════════════════════════════ --
+section class=cta-section id=start
+  div class=cta-bgdiv
+  div class=cta-grid-linesdiv
+  div class=cta-inner reveal
+    h2 class=cta-title지금 바로brspan시작하세요spanh2
+    p class=cta-sub
+      코드를 외우는 시대는 끝났습니다.br
+      당신의 아이디어를 현실로 만드는 가장 빠른 방법.
+    p
+    div class=cta-actions
+      a href=# class=btn-primary무료로 시작하기 →a
+      a href=#how class=btn-outline작동 원리 보기a
+    div
+  div
+section
+
+!-- ══ FOOTER ══════════════════════════════════ --
+footer
+  div class=footer-logoVIBEspan.spanCODEdiv
+  span class=footer-copy© 2025 VibeCoding. All rights reserved.span
+  ul class=footer-links
+    lia href=#개인정보처리방침ali
+    lia href=#이용약관ali
+    lia href=#문의하기ali
+  ul
+footer
+
+!-- ══ SCRIPTS ══════════════════════════════════ --
+script
+ ── Custom Cursor ─────────────────────── 
+(function () {
+  const dot  = document.getElementById('cursorDot');
+  const ring = document.getElementById('cursorRing');
+  if (!dot  !ring) return;
+
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e = {
+    mx = e.clientX; my = e.clientY;
+    dot.style.left = mx + 'px';
+    dot.style.top  = my + 'px';
+  });
+
+  (function animRing() {
+    rx += (mx - rx)  0.13;
+    ry += (my - ry)  0.13;
+    ring.style.left = rx + 'px';
+    ring.style.top  = ry + 'px';
+    requestAnimationFrame(animRing);
+  })();
+
+  document.querySelectorAll('a, button, .feat-card, .step, .testi-card, .compare-card').forEach(el = {
+    el.addEventListener('mouseenter', () = ring.classList.add('hovered'));
+    el.addEventListener('mouseleave', () = ring.classList.remove('hovered'));
+  });
+})();
+
+ ── Progress Bar ──────────────────────── 
+(function () {
+  const bar = document.getElementById('progressBar');
+  window.addEventListener('scroll', () = {
+    const pct = window.scrollY  (document.body.scrollHeight - window.innerHeight)  100;
+    bar.style.width = Math.min(pct, 100) + '%';
+  });
+})();
+
+ ── Nav scroll class ───────────────────── 
+(function () {
+  const nav = document.getElementById('mainNav');
+  window.addEventListener('scroll', () = {
+    nav.classList.toggle('scrolled', window.scrollY  40);
+  });
+})();
+
+ ── Mobile Nav ────────────────────────── 
+function toggleMobileNav() {
+  const mn = document.getElementById('mobileNav');
+  mn.classList.toggle('open');
+  document.body.style.overflow = mn.classList.contains('open')  'hidden'  '';
+}
+function closeMobileNav() {
+  document.getElementById('mobileNav').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+ ── Scroll Reveal (IntersectionObserver) ─ 
+(function () {
+  const io = new IntersectionObserver(entries = {
+    entries.forEach(e = {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold 0.12 });
+  document.querySelectorAll('.reveal').forEach(el = io.observe(el));
+})();
+
+ ── Active Nav Highlight ───────────────── 
+(function () {
+  const sections = document.querySelectorAll('section[id]');
+  const links    = document.querySelectorAll('.nav-links a');
+  window.addEventListener('scroll', () = {
+    let cur = '';
+    sections.forEach(s = {
+      if (window.scrollY = s.offsetTop - 130) cur = s.id;
+    });
+    links.forEach(a = {
+      const href = a.getAttribute('href');
+      a.style.color = href === '#' + cur  'var(--green)'  '';
+    });
+  });
+})();
+
+ ── Hero Glow Parallax ─────────────────── 
+(function () {
+  const glows = document.querySelectorAll('.hero-glow');
+  window.addEventListener('mousemove', e = {
+    const cx = (e.clientX  window.innerWidth  - .5)  24;
+    const cy = (e.clientY  window.innerHeight - .5)  24;
+    glows.forEach((g, i) = {
+      const f = (i + 1)  0.35;
+      g.style.transform = `translate(${cx  f}px, ${cy  f}px)`;
+    });
+  });
+})();
+
+ ── Smooth scroll for anchor links ─────── 
+document.querySelectorAll('a[href^=#]').forEach(a = {
+  a.addEventListener('click', e = {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) {
+      e.preventDefault();
+      target.scrollIntoView({ behavior 'smooth' });
+    }
+  });
+});
+script
+body
+html
